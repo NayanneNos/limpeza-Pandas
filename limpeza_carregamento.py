@@ -5,7 +5,7 @@ import os
 
 # Carregar o arquivo CSV
 # dtype = str : carrega todas as coluna do dataset como str
-arquivo = pd.read_csv('ENDERÇO DO ARQUIVO.csv', sep=";", dtype=str, encoding = 'UTF8')
+arquivo = pd.read_csv('ENDEREÇO DO ARQUIVO.csv', sep=";", dtype=str, encoding = 'UTF8')
 
 # Carregar planilha excel com todas colunas como texto
 arquivo = pd.read_excel('endereço do arquivo', 'planilha', dtype=str)  
@@ -147,121 +147,6 @@ time.sleep(3)
 # Excluir arquivo da pasta 
 
 pasta = "C:\\ONEDRIVE\\OneDrive - CERTIFICA BRASIL SERVICOS DE CERTIFICACAO DIGITAL\\Apuração de Resultados\\Dashs datastudio\\Central de Emissões\\Arquivos\\Cancelados\\Nosso"
-os.chdir(pasta)
-os.getcwd()
-
-if os.path.exists(new):
-    os.remove(new)
-time.sleep(1)
-
-    
-# Salvar novo arquivo na pasta
-os.chdir(download)
-os.getcwd()
-
-shutil.move( new , pasta)
-time.sleep(1)
-
-
-
-
-# Videoconferência Nosso
-
-
-
-# Acessando dados de atendimentos de Videoconferência
-link = "https://nossocertificado.gfsis.com.br/gestaofacil/login/videoconferencia/crud/AtendimentoVideoconferencia?ACAO=listagem"
-driver.get(link)
-
-
-
-
-# Baixando os Videoconferência Aprovada
-data = '/html/body/div[2]/div/form/div/div[2]/table[1]/tbody/tr/td/table[1]/tbody/tr[3]/td[2]/input[1]'
-driver.find_element_by_xpath(data).click()
-driver.find_element_by_xpath(data).send_keys("01/10/2021")
-
-driver.find_element_by_xpath('/html/body/div[2]/div/form/div/div[2]/table[1]/tbody/tr/td/table[1]/tbody/tr[3]/td[4]/select/option[3]').click()
-driver.find_element_by_xpath('//*[@id="link_filtros_avancados"]').click()
-
-time.sleep(0.5)
-        # período de Aprovação
-data = '/html/body/div[2]/div/form/div/div[2]/table[1]/tbody/tr/td/table[1]/tbody/tr[8]/td/div/table/tbody/tr[3]/td[4]/input[1]'
-driver.find_element_by_xpath(data).click()
-driver.find_element_by_xpath(data).send_keys(primeiroDia)
-data2 = '/html/body/div[2]/div/form/div/div[2]/table[1]/tbody/tr/td/table[1]/tbody/tr[8]/td/div/table/tbody/tr[3]/td[4]/input[3]'
-driver.find_element_by_xpath(data2).click()
-driver.find_element_by_xpath(data2).send_keys(ultimoDia)
-
-button = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="btn_exportar"]')))
-button.click()
-
-time.sleep(20)
-
-# Renomeando e salvando na pasta correta
-download = "C:\\ONEDRIVE\\OneDrive - CERTIFICA BRASIL SERVICOS DE CERTIFICACAO DIGITAL\\Apuração de Resultados\\Dashs datastudio\\Central de Emissões"
-os.chdir(download)
-os.getcwd()
-    
-list_of_files = glob.glob('C:\\ONEDRIVE\\OneDrive - CERTIFICA BRASIL SERVICOS DE CERTIFICACAO DIGITAL\\Apuração de Resultados\\Dashs datastudio\\Central de Emissões\\*.csv')
-arquivo = max(list_of_files , key=os.path.getctime)
-
-new =  nome + '.csv'
-os.replace(arquivo, new)
-time.sleep(3)
-    
-# Excluir arquivo da pasta 
-
-pasta = "C:\\ONEDRIVE\\OneDrive - CERTIFICA BRASIL SERVICOS DE CERTIFICACAO DIGITAL\\Apuração de Resultados\\Dashs datastudio\\Central de Emissões\\Arquivos\\Aprovados\\Video\\Nosso"
-os.chdir(pasta)
-os.getcwd()
-
-if os.path.exists(new):
-    os.remove(new)
-time.sleep(1)
-
-    
-# Salvar novo arquivo na pasta
-os.chdir(download)
-os.getcwd()
-
-shutil.move( new , pasta)
-time.sleep(1)
-
-# Videoconferência Nosso Cancelados
-link = "https://nossocertificado.gfsis.com.br/gestaofacil/login/videoconferencia/crud/AtendimentoVideoconferencia?ACAO=listagem"
-driver.get(link)
-
-driver.find_element_by_xpath('//*[@id="btn_limpar"]').click()
-
-# Baixando os Videoconferência Cancelados
-
-data = '/html/body/div[2]/div/form/div/div[2]/table[1]/tbody/tr/td/table[1]/tbody/tr[3]/td[2]/input[1]'
-driver.find_element_by_xpath(data).click()
-driver.find_element_by_xpath(data).send_keys("01/10/2021")
-driver.find_element_by_xpath('/html/body/div[2]/div/form/div/div[2]/table[1]/tbody/tr/td/table[1]/tbody/tr[3]/td[4]/select/option[4]').click()
-
-button = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="btn_exportar"]')))
-button.click()
-
-time.sleep(20)
-
-# Renomeando e salvando na pasta correta
-download = "pasta do arquivo"
-os.chdir(download)
-os.getcwd()
-
-# Procurando o arquivo .csv mais recente
-list_of_files = glob.glob('download\\*.csv')
-arquivo = max(list_of_files , key=os.path.getctime)
-
-nome = 'nome_arquivo'
-new =  nome + '.csv'
-os.replace(arquivo, new)
-time.sleep(3)
-
-# Excluir arquivo da pasta 
-pasta = "pasta destino"
 os.chdir(pasta)
 os.getcwd()
 

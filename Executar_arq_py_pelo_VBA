@@ -1,0 +1,13 @@
+Sub Macro()
+
+    Dim objShell As Object
+    Dim PythonPath, MyFilePath As String
+
+    Set objShell = VBA.CreateObject("Wscript.Shell")
+
+    PythonPath = "endreço do pyton\python.exe"
+    MyFilePath = " arquivo.py"
+
+    objShell.Run PythonPath & MyFilePath
+    
+End Sub

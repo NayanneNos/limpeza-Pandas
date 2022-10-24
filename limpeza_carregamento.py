@@ -31,6 +31,11 @@ arquivo['col1'] = arquivo['col1'].str.replace(",", " ", regex=False)
 # Dividir série em uma lista, separando por espaço
 arquivo['col1'] = arquivo['col1'].str.split()
 
+# Substituir na por "vazio"
+arquivo['col1'] = arquivo['col1'].fillna("vazio")
+
+
+##############################################################################################################################################
 # Remover de texto palavra inteira, sem pegar partes de outras palavras, lembre-se de realizar split antes
 # Remover LTDA
 for lista in arquivo['col1']:
@@ -46,6 +51,34 @@ for lista in arquivo['col1']:
 # Ao realizar o procedimento de str.split e logo após o str.join removerá todos os tipos de espaçamentos, 
 # simplificando o texto e removendo o caracteres especiais de espaçamento
 arquivo['col1'] = arquivo['col1'].str.join(' ')
+
+
+############################ OUTRA FORMA ###################################3
+
+from nltk.tokenize import sent_tokenize, word_tokenize, wordpunct_tokenize
+from nltk.stem import PorterStemmer
+from nltk.corpus import stopwords
+
+# Lista de stopwords do pacote NLTK
+stops = set(stopwords.words('portuguese'))
+
+stops_criadas = {'ficar', 'alex', 'caique', 'bianca', 'rayane', 'voces', 'flavia', 'fontenele',
+             'tá', 'ta', 'pra', 'mim', 'paula', 'lopes', 'rayane/brunna', 'caíque', 'aline', 'gonçalves', 'bernado',
+            'vitor', 'sei', '欄'}
+
+# Tokenizar a série
+arquivo['col1'] = arquivo['col1'].apply(lambda x: word_tokenize(x))
+
+# Retirar Stops
+arquivo['col1'] = arquivo['col1'].apply(lambda x :[i for i in x if not i.lower() in stops])
+
+# Retirar stops_criadas
+arquivo['col1'] = arquivo['col1'].apply(lambda x :[i for i in x if not i.lower() in stops_criadas])
+
+# Juntar reverter tTokenização 
+arquivo['col1'] = arquivo['col1'].str.join(' ')
+
+######################################################################################################################
 
 # Remover caracteres abaixo do fim do texto
 arquivo['col1'] = arquivo['col1'].str.rstrip("0123456789")
@@ -133,11 +166,11 @@ arquivo_CSV = arquivo.to_csv("endereço o qual deseja salvar.csv", sep=";", inde
 arquivo_CSV
 
 # Renomeando e salvando na pasta correta
-download = "C:\\ONEDRIVE\\OneDrive - CERTIFICA BRASIL SERVICOS DE CERTIFICACAO DIGITAL\\Apuração de Resultados\\Dashs datastudio\\Central de Emissões"
+download = "endereço da pasta"
 os.chdir(download)
 os.getcwd()
     
-list_of_files = glob.glob('C:\\ONEDRIVE\\OneDrive - CERTIFICA BRASIL SERVICOS DE CERTIFICACAO DIGITAL\\Apuração de Resultados\\Dashs datastudio\\Central de Emissões\\*.csv')
+list_of_files = glob.glob('download\\*.csv')
 arquivo = max(list_of_files , key=os.path.getctime)
 
 new =  nome + '.csv'
@@ -146,7 +179,7 @@ time.sleep(3)
     
 # Excluir arquivo da pasta 
 
-pasta = "C:\\ONEDRIVE\\OneDrive - CERTIFICA BRASIL SERVICOS DE CERTIFICACAO DIGITAL\\Apuração de Resultados\\Dashs datastudio\\Central de Emissões\\Arquivos\\Cancelados\\Nosso"
+pasta = "endereço da pasta de destino"
 os.chdir(pasta)
 os.getcwd()
 

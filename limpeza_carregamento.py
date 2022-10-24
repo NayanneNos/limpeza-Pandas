@@ -122,6 +122,11 @@ arquivo = arquivo.groupby("col").count()
 # Agrupa pela coluna col1, somando as outras colunas
 arquivo = arquivo.groupby('col1').aggregate([np.sum])
 
+# Agrupar selecionando colunas e modo de agrupamento
+arquivo = arquivo.groupby(by = ['col1']).agg({'col2': 'sum', 'col3': 'sum', 'col4': 'sum',
+                                                'col5': 'sum', 'col6': 'sum', 'col7': 'sum',
+                                                'col8': 'sum', 'col9': 'sum'})
+
 # resetando o index
 arquivo = arquivo.reset_index()
 
@@ -164,6 +169,9 @@ arquivo3 = arquivo.append(arquivo2, ignore_index=True)
 # index =  false : não salvar index
 arquivo_CSV = arquivo.to_csv("endereço o qual deseja salvar.csv", sep=";", index=False, encoding='ANSI')
 arquivo_CSV
+
+# Salvando dataset e definindo separador decimal e formato de datas
+arquivo_CSV = arquivo.to_csv("endereço e nome do arquivo.csv", date_format = '%m/%d/%Y', decimal= ',', sep=";", index=False, encoding='ANSI')
 
 # Renomeando e salvando na pasta correta
 download = "endereço da pasta"

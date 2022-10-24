@@ -1,0 +1,99 @@
+import pandas as pd
+import pymsteams
+from datetime import datetime, date, timedelta
+from dateutil.relativedelta import relativedelta
+import numpy as np
+from pandas.tseries.holiday import AbstractHolidayCalendar, GoodFriday, Holiday, Easter, Day
+
+# Data de hoje
+dat_informativo = datetime.now()
+data_formatada = data_informativo.strftime('%d/%m/%Y %H:%M')
+
+# Definindo feriados nacionais
+class Feriados_DF(AbstractHolidayCalendar):
+    rules = [
+        Holiday('Confraternização Universal', month=1, day=1),
+        Holiday('Segunda-Feira de Carnaval', month=1, day=1, offset=[Easter(), Day(-48)]),
+        Holiday('Terça-Feira de Carnaval', month=1, day=1, offset=[Easter(), Day(-47)]),
+        Holiday('Quarta-Feira de Cinzas', month=1, day=1, offset=[Easter(), Day(-46)]),
+        # Sexta-feira Santa
+        GoodFriday,
+        Holiday('Corpus Christi', month=1, day=1, offset=[Easter(), Day(60)]),
+        Holiday('Tiradentes', month = 4, day = 21),
+        Holiday('Dia do Trabalho', month = 5, day = 1),
+        Holiday('Revolução Constitucionalista', month=7, day=9, start_date='1997-01-01'),
+        Holiday('Independência do Brasil', month = 9, day = 7),
+        Holiday('Nossa Senhora Aparecida', month = 10, day = 12),
+        Holiday('Finados', month = 11, day = 2),
+        Holiday('Proclamação da República', month = 11, day = 15),
+        Holiday('Dia da Consciencia Negra', month=11, day=20, start_date='2004-01-01'),
+        Holiday('Vespera de Natal', month=12, day=24),
+        Holiday('Natal', month = 12, day = 25)]
+
+sp_cal = Feriados_DF()
+sp_feriados = pd.offsets.CustomBusinessDay(calendar=sp_cal)
+feriados_df = sp_cal.holidays(datetime(2000, 12, 31), datetime(2079, 12, 31))
+
+# Definir datas do mês atual
+dia = datetime.today()
+dia = dia - relativedelta(months=1, hour=0, minute=0, second=0, microsecond=0)
+dia = sp_feriados.rollback(dia - pd.tseries.offsets.BusinessDay(n=2))
+dia = dia.replace(hour=0, minute=0, second=0, microsecond=0)
+nxt_mnth = dia.replace(day = 28) + timedelta(days=4)
+
+primeirodia = dia.replace(day = 1)
+ultimoDia = nxt_mnth - timedelta(days=nxt_mnth.day)
+ultimoDia = ultimoDia.replace(hour=23, minute=59, second=0, microsecond=0)
+
+# Definir datas do mês anterior
+dia2 = dia - relativedelta(months=1, hour=0, minute=0, second=0, microsecond=0)
+nxt_mnth2 = dia2.replace(day = 28) + timedelta(days=4)
+
+primeirodia2 = dia2.replace(day = 1)
+ultimoDia2 = nxt_mnth2 - timedelta(days=nxt_mnth2.day)
+ultimoDia2 = ultimoDia2.replace(hour=23, minute=59, second=0, microsecond=0)
+print(primeirodia2)
+print(ultimoDia2)
+
+# Nomeando mês
+mes = dia.strftime('%B')
+if mes == 'January':
+    mes = 'janeiro'
+elif mes == 'February':
+    mes= 'fevereiro'
+elif mes == 'March':
+    mes = 'março'
+elif mes == 'April':
+    mes = 'abril'
+elif mes == 'May':
+    mes = 'maio'
+elif mes == 'June':
+    mes = 'junho'
+elif mes == 'July':
+    mes = 'julho'
+elif mes == 'August':
+    mes = 'agosto'
+elif mes == 'September':
+    mes = 'setembro'
+elif mes == 'October':
+    mes = 'outubro'
+elif mes == 'November':
+    mes = 'novembro'
+elif mes == 'December':
+    mes = 'dezembro'
+
+# Definindo 2 dias úteis anterior
+hoje = datetime.today()
+hoje = hoje.replace(hour=0, minute=0, second=0, microsecond=0)
+data_aprovacao = hoje - pd.tseries.offsets.BusinessDay(n=1)
+data_aprovacao = sp_feriados.rollback(data_aprovacao)
+data_aprovacao
+
+# Contar dias úteis até o fim do mês
+primeiroDia = dia.replace(day = 1)
+nxt_mnth = dia.replace(day = 28, hour=23, minute=59, second=0, microsecond=0) + timedelta(days=4)
+ultimoDia = nxt_mnth - timedelta(days=nxt_mnth.day)
+intervalo = len(pd.bdate_range(inicio.strftime('%Y-%m-%d'), ultimoDia.strftime('%Y-%m-%d'),freq='C', holidays=feriados_df))
+
+
+

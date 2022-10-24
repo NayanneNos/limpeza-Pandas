@@ -1,0 +1,27 @@
+Sub macro()
+
+    Application.Calculation = xlCalculationManual
+    Application.DisplayAlerts = False
+
+    Application.Goto Reference:="tabela"
+         ActiveWindow.SmallScroll Down:=-1
+    ActiveSheet.ListObjects("tabela").Range.AutoFilter Field:=2, _
+        Criteria1:=1, Operator:=11, Criteria2:=0, SubField:=0
+        Range("tabela").Selec
+        On Error GoTo NoBlanks
+                    Selection.SpecialCells(xlCellTypeVisible).Select
+                    Selection.ClearContents
+                           'LIMPA FILTROS QUANDO EXISTE
+                        Application.Goto Reference:="tabela"
+                        If ActiveSheet.AutoFilterMode Or ActiveSheet.FilterMode Then
+                                ActiveSheet.ShowAllData
+                        End If
+                        Selection.SpecialCells(xlCellTypeBlanks).Select
+                        Selection.Delete
+NoBlanks:
+
+    'LIMPA FILTROS QUANDO EXISTE
+If ActiveSheet.AutoFilterMode Or ActiveSheet.FilterMode Then
+            ActiveSheet.ShowAllData
+End If
+End Sub

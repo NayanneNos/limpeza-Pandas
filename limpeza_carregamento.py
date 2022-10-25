@@ -225,3 +225,54 @@ arquivos['col1'] = pd.to_datetime(arquivos['col1'],  errors='ignore', dayfirst =
 # Fazendo join especificando as colunas e transformando-as em index
 arquivos3 = arquivos1.set_index('ID').join(arquivos2.set_index('ID'))
 
+##############################################################
+import pandas as pd
+import numpy as np
+import pymsteams
+import functools
+import operator
+
+def clean(text):
+    # clean text for creating a folder
+    return "".join(c if c.isalnum() else "_" for c in text)
+
+# Listando todas as duplicatas do dataset arquivo e enviando recado em canal do teams
+# É utilizado a extensão Incoming Webhook para envios de mensagens para o canal
+Duplicatas_arquivo = arquivos['col1'][arquivos['col1']duplicated()]
+Duplicatas_arquivo = Duplicatas_arquivo.reset_index()
+
+if len(Duplicatas_arquivo) > 0:
+
+    Duplicatas_arquivo_lista = []
+    Duplicatas_teams_lista = []
+
+    for lista in Duplicatas_arquivo['col1']:
+        lista_repetidos =  Duplicatas_arquivo_lista.append(lista)
+
+    for lista in Duplicatas_arquivo_lista:
+        lista_repetidos =  Duplicatas_teams_lista.append(str("* ") + str(lista) + str(' \n \n '))
+
+    texto = functools.reduce(operator.add, (Duplicatas_teams_lista))
+    a = str("TEXTO OPCIONAL: \n \n") + texto
+    
+    myTeamsMessage = pymsteams.connectorcard("LINK CANAL")
+    myTeamsMessage.text("Informativo Setor de Inteligência:")
+    myTeamsMessage.color('#A0D7C2')
+
+
+    myMessageSection = pymsteams.cardsection()
+
+    # Activity Elements
+    myMessageSection.activityTitle("TÍTULO")
+    myMessageSection.activitySubtitle(a)
+    myMessageSection.activityText("TEXTO OPCIONAL")
+
+
+    # Texto da Seção
+    myMessageSection.text("TEXTO")
+
+
+    # Adicione sua seção ao objeto do cartão do conector antes de enviar
+    myTeamsMessage.addSection(myMessageSection)
+
+    myTeamsMessage.send()

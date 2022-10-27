@@ -276,3 +276,34 @@ if len(Duplicatas_arquivo) > 0:
     myTeamsMessage.addSection(myMessageSection)
 
     myTeamsMessage.send()
+
+    
+# Mudar tipo da coluna para texto
+arquivos['col1'] = arquivos['col1'].astype('str')
+
+# Extrair arquivo zip
+with ZipFile('ENDEREÇO DO ARQUIVO.zip', 'r') as zip_ref:
+    zip_ref.extractall(path='PASTA AO QUAL DESEJA EXTRAIR', pwd=b"SENHA")
+
+    
+# LISTANDO O ARQUIVOS DE UMA PASTA E EXTRAINDO DATA E HORA QUE FOI SALVO
+
+list_of_files = glob.glob('PASTA DO ARQUIVO\\*.zip')
+lista_arquivos = []
+for f in list_of_files:
+    lista_arquivos.append(f)
+
+data_arquivos = []
+for lista in lista_arquivos:
+    ti_m = os.path.getmtime(lista) 
+    m_ti = time.ctime(ti_m) 
+    t_obj = time.strptime(m_ti) 
+    T_stamp = time.strftime("%d/%m/%Y %H:%M:%S", t_obj) 
+    data_arquivos.append(T_stamp)
+    
+limpo_arquivos = []
+for f in lista_arquivos:
+    limpo_arquivos.append(f.replace("PASTA DO ARQUIVO", ""))
+
+documentos = dict(zip(limpo_arquivos, data_arquivos))
+

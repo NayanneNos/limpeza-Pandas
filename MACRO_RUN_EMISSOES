@@ -1,0 +1,487 @@
+Dim LocalizaMes As String
+Sub ExportarDados()
+    Application.Calculation = xlCalculationManual
+    Application.DisplayAlerts = False
+
+    Sheets("EMISSOES").Select
+    Set target = Range("B1")
+    If target = True Then
+        Range("C1").FormulaLocal = "=TEXTO(DATAM(DATA(ANO(HOJE());MÊS(HOJE());DIA(1));-1);""MM/DD/AAAA"")"
+    End If
+    
+    Set filtro_data_apuracao = Range("C1")
+
+
+'LIMPA FILTROS QUANDO EXISTE
+        If ActiveSheet.AutoFilterMode Or ActiveSheet.FilterMode Then
+            ActiveSheet.ShowAllData
+        End If
+
+
+
+'ABRIR ARQUIVO CSV COM TODAS AS EMISSÕES
+    Workbooks.OpenText Filename:= _
+        "C:\ONEDRIVE\OneDrive - CERTIFICA BRASIL SERVICOS DE CERTIFICACAO DIGITAL\Financeiro CD\APURAÇAO DE EMISSOES 4.0.csv" _
+        , Origin:=65001, StartRow:=1, DataType:=xlDelimited, TextQualifier:= _
+        xlDoubleQuote, ConsecutiveDelimiter:=False, Tab:=False, Semicolon:=True, _
+        Comma:=False, Space:=False, Other:=False, FieldInfo:=Array(Array(1, 1), _
+        Array(2, 4), Array(3, 4), Array(4, 1), Array(5, 1), Array(6, 1), Array(7, 1), Array(8, 1), _
+        Array(9, 1), Array(10, 1), Array(11, 1), Array(12, 1), Array(13, 1), Array(14, 1), Array(15 _
+        , 1), Array(16, 1), Array(17, 1), Array(18, 1), Array(19, 1), Array(20, 1), Array(21, 1), _
+        Array(22, 1), Array(23, 1), Array(24, 1), Array(25, 1), Array(26, 1), Array(27, 1), Array( _
+        28, 1), Array(29, 1), Array(30, 1), Array(31, 1), Array(32, 1), Array(33, 1), Array(34, 1), _
+        Array(35, 1), Array(36, 1), Array(37, 1), Array(38, 4), Array(39, 4), Array(40, 1), Array( _
+        41, 1), Array(42, 1), Array(43, 1), Array(44, 1), Array(45, 1), Array(46, 1), Array(47, 1), _
+        Array(48, 1), Array(49, 1), Array(50, 1), Array(51, 1), Array(52, 1), Array(53, 1), Array( _
+        54, 1), Array(55, 1), Array(56, 1), Array(57, 4), Array(58, 1), Array(59, 1), Array(60, 1), _
+        Array(61, 1), Array(62, 1)), TrailingMinusNumbers:=True
+
+'CRIAR FILTROS NO ARQUIVO CSV
+        Windows("APURAÇAO DE EMISSOES 4.0.csv").Activate
+        Sheets("APURAÇAO DE EMISSOES 4.0").Select
+        
+        'CRIA TABELA EM CSV PARA FILTRAR DADOS A SEREM EXCLUÍDOS
+            Windows("APURAÇAO DE EMISSOES 4.0.csv").Activate
+            ActiveCell.Select
+            Range(Selection, ActiveCell.SpecialCells(xlLastCell)).Select
+            Application.CutCopyMode = False
+            ActiveSheet.ListObjects.Add(xlSrcRange, Selection, , xlYes). _
+                Name = "Emissoes_Original"
+            ActiveCell.Range("Emissoes_Original[#All]").Select
+            
+        'LIMPA FILTROS QUANDO EXISTE
+                'If ActiveSheet.AutoFilterMode Or ActiveSheet.FilterMode Then
+                    'ActiveSheet.ShowAllData
+                'End If
+
+'FILTRA MES PARA APAGAR
+        ActiveSheet.ListObjects("Emissoes_Original").Range.AutoFilter Field:=3, Criteria1:= _
+        ">=" & filtro_data_apuracao, Operator:=xlAnd
+        Range("Emissoes_Original").Select
+        Selection.SpecialCells(xlCellTypeVisible).Select
+        Selection.ClearContents
+         
+'LIMPA FILTROS QUANDO EXISTE
+        If ActiveSheet.AutoFilterMode Or ActiveSheet.FilterMode Then
+            ActiveSheet.ShowAllData
+        End If
+
+
+'Filtra os pgts em abertos e apaga para uma nova atualização
+Windows("APURAÇAO DE EMISSOES 4.0.csv").Activate
+Sheets("APURAÇAO DE EMISSOES 4.0").Select
+ActiveSheet.ListObjects("Emissoes_Original").Range.AutoFilter Field:=35, Criteria1:= _
+"EM ABERTO"
+
+
+
+
+
+
+Range("Emissoes_Original").Select
+Selection.SpecialCells(xlCellTypeVisible).Select
+Selection.ClearContents
+
+'LIMPA FILTROS QUANDO EXISTE
+        If ActiveSheet.AutoFilterMode Or ActiveSheet.FilterMode Then
+            ActiveSheet.ShowAllData
+        End If
+
+
+'Filtro do Mais Antigo para o mais Novo pela data de aprovação
+
+ActiveWorkbook.Worksheets("APURAÇAO DE EMISSOES 4.0").ListObjects("Emissoes_Original").Sort.SortFields. _
+Clear
+ActiveWorkbook.Worksheets("APURAÇAO DE EMISSOES 4.0").ListObjects("Emissoes_Original").Sort.SortFields. _
+Add2 Key:=Range("Emissoes_Original[[#All],[Data de aprovação]]"), SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+With ActiveWorkbook.Worksheets("APURAÇAO DE EMISSOES 4.0").ListObjects("Emissoes_Original").Sort
+    .Header = xlYes
+    .MatchCase = False
+    .Orientation = xlTopToBottom
+    .SortMethod = xlPinYin
+    .Apply
+End With
+
+
+
+
+
+' Exporta os dados do mês atual para a planilha original congelando eles.
+' APURAÇÃO DE EMISSÕES 3.1 Run
+        Windows("APURAÇAO DE EMISSOES 4.0 - Run.xlsm").Activate
+        Sheets("EMISSOES").Select
+        'LIMPA FILTROS QUANDO EXISTE
+                If ActiveSheet.AutoFilterMode Or ActiveSheet.FilterMode Then
+                    ActiveSheet.ShowAllData
+                End If
+        Range("EMISSOES[[#Headers],[Identificador]]").Select
+        ActiveCell.Offset(1, 0).Range("A1").Select
+        Range("EMISSOES").Select
+        Selection.Copy
+
+
+
+Application.DisplayAlerts = False
+
+
+
+' APURAÇÃO DE EMISSÕES 3.1
+Windows("APURAÇAO DE EMISSOES 4.0.csv").Activate
+Sheets("APURAÇAO DE EMISSOES 4.0").Select
+Range("Emissoes_Original[[#Headers],[Identificador]]").Select
+ActiveCell.Offset(1, 1).Range("Emissoes_Original[[#Headers],[Identificador]]").Select
+Selection.End(xlDown).Select
+ActiveCell.Offset(1, -1).Range("Emissoes_Original[[#Headers],[Identificador]]").Select
+Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+
+
+
+Application.DisplayAlerts = True
+
+
+
+' AJUSTAR DATAS EM FORMATO PADRÃO
+
+
+
+
+
+' COLUNA "B"
+Range("Emissoes_Original[[#Headers],[Identificador]]").Select
+ActiveCell.Offset(1, 1).Range("Emissoes_Original[[#Headers],[Identificador]]").Select
+Range(Selection, Selection.End(xlDown)).Select
+Selection.NumberFormat = "m/d/yyyy"
+
+
+
+
+
+' COLUNA "C"
+Range("Emissoes_Original[[#Headers],[Identificador]]").Select
+ActiveCell.Offset(1, 2).Range("Emissoes_Original[[#Headers],[Identificador]]").Select
+Range(Selection, Selection.End(xlDown)).Select
+Selection.NumberFormat = "m/d/yyyy"
+
+
+
+' COLUNA "T"
+'Range("Emissoes_Original[[#Headers],[DATA BASE]]").Select
+'ActiveCell.Offset(1, 0).Range("Emissoes_Original[[#Headers],[Identificador]]").Select
+'Range(Selection, Selection.End(xlDown)).Select
+'Selection.NumberFormat = "m/d/yyyy"
+
+
+
+' COLUNA "AL"
+Range("Emissoes_Original[[#Headers],[DATA DINAMICA]]").Select
+ActiveCell.Offset(1, 0).Range("Emissoes_Original[[#Headers],[Identificador]]").Select
+Range(Selection, Selection.End(xlDown)).Select
+Selection.NumberFormat = "m/d/yyyy"
+
+
+
+
+
+' COLUNA "AM"
+Range("Emissoes_Original[[#Headers],[DATA DINAMICA COMISSÃO]]").Select
+ActiveCell.Offset(1, 0).Range("Emissoes_Original[[#Headers],[Identificador]]").Select
+Range(Selection, Selection.End(xlDown)).Select
+Selection.NumberFormat = "m/d/yyyy"
+
+
+
+
+
+' COLUNA "BE"
+Range("Emissoes_Original[[#Headers],[Validade]]").Select
+ActiveCell.Offset(1, 0).Range("Emissoes_Original[[#Headers],[Identificador]]").Select
+Range(Selection, Selection.End(xlDown)).Select
+Selection.NumberFormat = "m/d/yyyy"
+
+
+
+'Filtro do Mais Antigo para o mais Novo
+
+
+
+ActiveWorkbook.Worksheets("APURAÇAO DE EMISSOES 4.0").ListObjects("Emissoes_Original").Sort.SortFields. _
+Clear
+ActiveWorkbook.Worksheets("APURAÇAO DE EMISSOES 4.0").ListObjects("Emissoes_Original").Sort.SortFields. _
+Add2 Key:=Range("Emissoes_Original[[#All],[Data de aprovação]]"), SortOn:=xlSortOnValues, Order _
+:=xlAscending, DataOption:=xlSortNormal
+With ActiveWorkbook.Worksheets("APURAÇAO DE EMISSOES 4.0").ListObjects("Emissoes_Original").Sort
+    .Header = xlYes
+    .MatchCase = False
+    .Orientation = xlTopToBottom
+    .SortMethod = xlPinYin
+    .Apply
+End With
+
+'REMOVER DUPLICATAS
+    Windows("APURAÇAO DE EMISSOES 4.0.csv").Activate
+    Sheets("APURAÇAO DE EMISSOES 4.0").Select
+
+    'Dim intArray As Variant, i As Integer
+    Dim rng As Range
+    Set rng = ActiveSheet.Range("Emissoes_Original").Rows
+    With rng
+        ReDim intArray(0 To .Columns.Count - 1)
+        For i = 0 To UBound(intArray)
+                        intArray(i) = i + 1
+        Next i
+        .RemoveDuplicates Columns:=(intArray), Header:=xlYes
+    End With
+
+
+
+Windows("APURAÇAO DE EMISSOES 4.0 - Run.xlsm").Activate
+Sheets("EMISSOES").Select
+
+'LIMPA FILTROS QUANDO EXISTE
+        If ActiveSheet.AutoFilterMode Or ActiveSheet.FilterMode Then
+            ActiveSheet.ShowAllData
+        End If
+    
+    'CRIANDO OBJETO PARA FILTRO EM EMISSÕES RUN
+    Dim filtro_em_aberto
+    filtro_em_aberto = "<>" & "EM ABERTO"
+    
+    'FILTRA MES PARA APAGAR
+        ActiveSheet.ListObjects("EMISSOES").Range.AutoFilter Field:=3, Criteria1:= _
+        "<" & filtro_data_apuracao, Operator:=xlAnd
+
+'FILTRA DIFERENTE DE 'EM ABERTO'
+
+
+    ActiveSheet.ListObjects("EMISSOES").Range.AutoFilter Field:=35, Criteria1:=filtro_em_aberto
+            Range("EMISSOES").Select
+                On Error GoTo NoBlanks
+                    Selection.SpecialCells(xlCellTypeVisible).Select
+                    Selection.ClearContents
+NoBlanks:
+    
+'APAGAR LINHAS EM BRANCO DOS DOIS ARQUIVOS
+    Call Macro1
+    Call macro2
+
+'LIMPA FILTROS QUANDO EXISTE
+        If ActiveSheet.AutoFilterMode Or ActiveSheet.FilterMode Then
+            ActiveSheet.ShowAllData
+        End If
+        ActiveWorkbook.Worksheets("EMISSOES").ListObjects("EMISSOES").Sort.SortFields. _
+        Add2 Key:=Range("EMISSOES[[#All],[Data de aprovação]]"), SortOn:=xlSortOnValues, Order _
+        :=xlAscending, DataOption:=xlSortNormal
+        With ActiveWorkbook.Worksheets("EMISSOES").ListObjects("EMISSOES").Sort
+            .Header = xlYes
+            .MatchCase = False
+            .Orientation = xlTopToBottom
+            .SortMethod = xlPinYin
+            .Apply
+        End With
+
+    'SALVAR CSV
+    Application.DisplayAlerts = False
+    Windows("APURAÇAO DE EMISSOES 4.0.csv").Activate
+    ChDir _
+        "C:\ONEDRIVE\OneDrive - CERTIFICA BRASIL SERVICOS DE CERTIFICACAO DIGITAL\Financeiro CD"
+    ActiveWorkbook.SaveAs Filename:= _
+        "C:\ONEDRIVE\OneDrive - CERTIFICA BRASIL SERVICOS DE CERTIFICACAO DIGITAL\Financeiro CD\APURAÇAO DE EMISSOES 4.0.csv" _
+        , FileFormat:=xlCSV, CreateBackup:=False
+    ActiveWindow.Close
+    
+    Windows("APURAÇAO DE EMISSOES 4.0 - Run.xlsm").Activate
+
+    
+MsgBox "EMISSOES.csv SALVO E FECHADO, Pronto!", vbInformation, "AEEEEE!"
+
+
+End Sub
+Sub Subir_emi()
+'
+' Subir_emi
+'
+' Definindo planilha que vai executar os comandos
+    
+    Application.DisplayAlerts = False
+    Application.DisplayAlerts = False
+    Dim arrString As String, usedRowsNumber As Integer, relativePath As String
+    Dim vWbkActual As Object
+    Dim vShtActual As Object
+    Dim vShtAcres As Object
+    
+    
+    Set vWbkActual = Application.ActiveWorkbook
+    Set vShtActual = vWbkActual.Sheets("EMISSOES")
+    Set vShtAcres = vWbkActual.Sheets("Acrescentar")
+    relativePath = vWbkActual.Path
+
+    Application.Wait (Now + TimeValue("0:00:03"))
+
+    With vShtActual
+        .Select
+        .Range("A2").Select
+        ' Limpar filtros  em emissões
+        If ActiveSheet.AutoFilterMode Or ActiveSheet.FilterMode Then
+            ActiveSheet.ShowAllData
+        End If
+    End With
+
+    With vShtAcres
+        .Select
+        .Activate
+    
+        ' Limpar filtros em Acrescentar
+        If ActiveSheet.AutoFilterMode Or ActiveSheet.FilterMode Then
+            ActiveSheet.ShowAllData
+        End If
+
+        .Select
+        Range("Acrescentar").Select
+        Selection.Copy
+    End With
+     
+    With vShtActual
+        .Select
+        .Range("A4").End(xlDown).Select
+        .Activate
+        ActiveCell.Offset(1, 0).Range("A1").Select
+        vShtActual.Paste
+    End With
+
+    Application.CutCopyMode = False
+End Sub
+
+Sub apuracao()
+
+'MUDA FILTRO DE DATA PARA O MÊS ATUAL
+    Application.Calculation = xlCalculationManual
+    Application.DisplayAlerts = False
+
+    Sheets("EMISSOES").Select
+    Range("C1").FormulaLocal = "=TEXTO(DATAM(DATA(ANO(HOJE());MÊS(HOJE());DIA(1));0);""MM/DD/AAAA"")"
+    
+    Set filtro_data_apuracao = Range("C1")
+    
+    'LIMPA FILTROS
+        If ActiveSheet.AutoFilterMode Or ActiveSheet.FilterMode Then
+            ActiveSheet.ShowAllData
+        End If
+
+'FILTRA MÊS ANTERIOR PARA CONGELAR INFORMAÇÃO
+    
+    'ORDENA PELA DATA DE APROVAÇÃO
+        ActiveWorkbook.Worksheets("EMISSOES").ListObjects("EMISSOES").Sort.SortFields. _
+        Add2 Key:=Range("EMISSOES[[#All],[Data de aprovação]]"), SortOn:=xlSortOnValues, Order _
+        :=xlAscending, DataOption:=xlSortNormal
+        With ActiveWorkbook.Worksheets("EMISSOES").ListObjects("EMISSOES").Sort
+            .Header = xlYes
+            .MatchCase = False
+            .Orientation = xlTopToBottom
+            .SortMethod = xlPinYin
+            .Apply
+        End With
+
+    'FILTRA
+        ActiveSheet.ListObjects("EMISSOES").Range.AutoFilter Field:=3, Criteria1:= _
+        "<" & filtro_data_apuracao, Operator:=xlAnd
+    
+    'COLA VALORES
+        Range("EMISSOES").Select
+        Selection.Copy
+        Selection.SpecialCells(xlCellTypeVisible).Select
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+    
+    'CRIANDO OBJETO PARA FILTRAR DIFERENTE DE EM ABERTO
+        Dim filtro_em_aberto
+        filtro_em_aberto = "<>" & "EM ABERTO"
+    
+    'CRIANDO DIFERENTE DE EM ABERTO
+        ActiveSheet.ListObjects("EMISSOES").Range.AutoFilter Field:=35, Criteria1:=filtro_em_aberto
+            Range("EMISSOES").Select
+                On Error GoTo NoBlanks
+                    Selection.SpecialCells(xlCellTypeVisible).Select
+                    Selection.ClearContents
+NoBlanks:
+    
+    
+    'LIMPA FILTROS
+        If ActiveSheet.AutoFilterMode Or ActiveSheet.FilterMode Then
+            ActiveSheet.ShowAllData
+        End If
+        
+        
+    'ORDENA PELA DATA DE APROVAÇÃO
+        ActiveWorkbook.Worksheets("EMISSOES").ListObjects("EMISSOES").Sort.SortFields. _
+        Add2 Key:=Range("EMISSOES[[#All],[Data de aprovação]]"), SortOn:=xlSortOnValues, Order _
+        :=xlAscending, DataOption:=xlSortNormal
+        With ActiveWorkbook.Worksheets("EMISSOES").ListObjects("EMISSOES").Sort
+            .Header = xlYes
+            .MatchCase = False
+            .Orientation = xlTopToBottom
+            .SortMethod = xlPinYin
+            .Apply
+        End With
+        
+'APAGAR LINHAS EM BRANCO DOS DOIS ARQUIVOS
+    Call macro2
+
+        
+'SALVAR CSV
+    Application.DisplayAlerts = False
+    
+    Windows("APURAÇAO DE EMISSOES 4.0 - Run.xlsm").Activate
+ 
+MsgBox "Pronto!", vbInformation, "AEEEEE!"
+
+End Sub
+
+Sub Macro1()
+'APAGAR LINHAS EM BRANCO
+    Windows("APURAÇAO DE EMISSOES 4.0.csv").Activate
+    'LIMPA FILTROS QUANDO EXISTE
+        If ActiveSheet.AutoFilterMode Or ActiveSheet.FilterMode Then
+            ActiveSheet.ShowAllData
+        End If
+        
+    ActiveSheet.ListObjects("Emissoes_Original").Range.AutoFilter Field:=3, _
+        Criteria1:="="
+        
+    On Error GoTo nocells
+            Range("Emissoes_Original").Select
+            Selection.SpecialCells(xlCellTypeVisible).Select
+        'DELETAR LINHAS EM BRANCO NO CSV
+        Selection.EntireRow.Delete
+nocells:
+        Range("Emissoes_Original[[#Headers],[Data de aprovação]]").Select
+        ActiveSheet.ShowAllData
+End Sub
+
+
+Sub macro2()
+
+    Windows("APURAÇAO DE EMISSOES 4.0 - Run.xlsm").Activate
+    Sheets("EMISSOES").Select
+    'LIMPA FILTROS QUANDO EXISTE
+        If ActiveSheet.AutoFilterMode Or ActiveSheet.FilterMode Then
+            ActiveSheet.ShowAllData
+        End If
+    ActiveSheet.ListObjects("EMISSOES").Range.AutoFilter Field:=3, Criteria1:= _
+        "="
+
+    On Error GoTo nocells
+    'DELETAR LINHAS EM BRANCO NA RUN
+    Range("EMISSOES").Select
+    Selection.SpecialCells(xlCellTypeVisible).Select
+        Selection.EntireRow.Delete
+nocells:
+    Range("EMISSOES[[#Headers],[Data de aprovação]]").Select
+    ActiveWorkbook.Worksheets("EMISSOES").ListObjects("EMISSOES").Sort.SortFields. _
+        Clear
+    ActiveSheet.ShowAllData
+
+End Sub
+
+
+

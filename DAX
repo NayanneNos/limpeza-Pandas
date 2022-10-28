@@ -1,0 +1,109 @@
+
+# cRIANDO UMA TABELA CALENDÁRIO
+Calendario = 
+VAR MenorData = MIN(EMISSOES[Data de aprovação])
+VAR MaiorData = MAX(EMISSOES[Data de aprovação])
+
+VAR BaseCalendar = CALENDAR ( MenorData, MaiorData )
+RETURN
+    GENERATE (
+        BaseCalendar,
+        VAR Data = FORMAT ( [Date], "DD/MM/YYYY" )
+        VAR Ano = FORMAT([Date], "YYYY")
+        VAR Mes = FORMAT([Date], "MMMM")
+        VAR MesAno = FORMAT ( [Date], "MMM/YY" )
+        Var SemAno = FORMAT(Weeknum([Date]), "00")
+        Var SemMes = Weeknum([Date]) - WEEKNUM(DATE(YEAR([Date]), MONTH([Date]),1))+1
+        Var SemanaM = FORMAT([Date], "MMM/YY") & " Semana " & SemMes
+        Var Semana = "Semana " & SemAno & " de " & Ano
+        VAR indice = VALUE( FORMAT([Date], "YYYYMM"))
+        Var indiceano = Ano & SemAno
+        RETURN ROW (
+            "IndiceMes", indice,
+            "IndiceAno", indiceano,
+            "Data", Data,
+            "MesAno", MesAno,
+            "Ano", Ano,
+            "Mês", Mes,
+            "Semana do Ano", Semana,
+            "Semana do mês", SemanaM)
+    )
+    
+    # ADICIONAR Nº DIA DA SEMANA 
+    DiaDaSemana = WEEKDAY(Calendario[Date], 1)
+    
+   
+    # ADICIONAR DIA DA SEMANA ABREVIADO
+    Dia da Semana abrev = SWITCH(Calendario[DiaDaSemana], 1, "Dom", 2, "Seg", 3, "Ter", 4, "Qua", 5, "Qui", 6, "Sex", 7, "Sab")
+    
+    # DEFINIR FDS
+    DiaDaSemana? = if(Calendario[Dia da Semana abrev]= "Sab" || Calendario[Dia da Semana abrev]= "Dom", "Não", "Sim")
+    
+    # IDENTIFICAR FERIADOS
+    Feriados? = RELATED(Feriados[Feriados])
+    
+    # DIA ÚTIL
+    
+    Dia.Emissões = if( Calendario[Date] < TODAY(), Calendario[Dia util?], 0)
+
+# DIAS ÚTEIS IDENTIFICANDO HORA DE ATUALIZAÇÃO
+Dia.Emissões = if(date(YEAR(dCalendario[Date]), MONTH(dCalendario[Date]), 
+DAY(dCalendario[Date])) + time(14,30,0) < ((UTCNOW() -1 - time(3,0,0))) , dCalendario[Dia util?], 0)
+
+    # CRESCIMENTO DO ULTIMO MêS
+    %Crescimento_Ult_M = 
+VAR T_emi_UM = CALCULATE(DISTINCTCOUNT(EMISSOES[Identificador]), DATEADD(Calendario[Date], -1, MONTH))
+VAR cres = Divide (DISTINCTCOUNT(EMISSOES[Identificador]) - T_emi_UM, T_emi_UM)
+
+Return cres
+
+# CRESCIMENTO DO ULTIMO 7 DIAS
+%Crescimento_Ult_7dias = 
+VAR T_emi_UM = CALCULATE(DISTINCTCOUNT(EMISSOES[Identificador]), DATEADD(Calendario[Data], -7,DAY))
+VAR cres = Divide (DISTINCTCOUNT(EMISSOES[Identificador]) - T_emi_UM, T_emi_UM)
+
+Return cres
+
+
+Média de Emissões atual = 
+
+VAR Emissao = CALCULATE(DISTINCTCOUNT(EMISSOES[Identificador]), DATEADD(Calendario[Date], 1, MONTH))
+Var PA = CALCULATE(DISTINCTCOUNT(EMISSOES[A quem cobrar?]), DATEADD(Calendario[Date], 1, MONTH))
+VAR media = DIVIDE(Emissao, PA)
+
+Return media
+
+Média de Emissões no último mês = 
+
+VAR Emissao = CALCULATE(DISTINCTCOUNT(EMISSOES[Identificador]), DATEADD(Calendario[Date], -1, MONTH))
+Var PA = CALCULATE(DISTINCTCOUNT(EMISSOES[A quem cobrar?]), DATEADD(Calendario[Date], -1, MONTH))
+VAR media = DIVIDE(Emissao, PA)
+
+Return media
+
+Média de Emissões por dia último mês = 
+
+VAR Emissao = distinctCOUNT(EMISSOES[Identificador])
+Var data = sum(Calendario[Dia.Emissões])
+VAR PA = distinctCOUNT(EMISSOES[PA])
+VAR media = Emissao/data/PA
+
+Return media
+
+# CRIAR TABELA DE TEMPO SEM EMITIR
+AnosSemEmitir = DATEDIFF(EmissoesSemInati[Data de aprovação], today(), YEAR)
+
+diasSemEmitir = DATEDIFF(EmissoesSemInati[Data de aprovação], today(), DAY)
+
+SemanasSemEmitir = DATEDIFF(EmissoesSemInati[Data de aprovação], today(), WEEK)
+
+Novatabela = GROUPBY(EmissoesSemInati, EmissoesSemInati[PA], (EmissoesSemInati[AnosSemEmitir]), 
+EmissoesSemInati[SemanasSemEmitir], EmissoesSemInati[diasSemEmitir])
+
+Valor Total de Venda = CALCULATE(SUM('PackControleDeVendas'[VALOR TOTAL]) , USERELATIONSHIP(dCalendario[Date], PackControleDeVendas[DATA EMAIL]))
+
+# CRIAR UMA NOVA TABELA
+PackControledeVendas2 = SELECTCOLUMNS(PackControleDeVendas, "AE / PE", PackControleDeVendas[AE / PE], "VALOR TOTAL", PackControleDeVendas[VALOR TOTAL] , 
+"VALOR VENCIDO", PackControleDeVendas[Valor Vencido], "Valor Inadimplente", PackControleDeVendas[Valor Inadimplente], "AGR", PackControleDeVendas[AGR], "PA", 
+PackControleDeVendas[PA], "VENCIMENTO", PackControleDeVendas[VENCIMENTO], "cnpj BITRIX",PackControleDeVendas[CNPJ - BITRIX])
+

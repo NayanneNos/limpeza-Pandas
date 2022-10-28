@@ -1,0 +1,11 @@
+# Adicionando coluna para filtrar de mês anterior
+= Table.AddColumn(#"Tipo Alterado", "Filtro de 1 mes", each [Data_Recusa] >= Date.AddMonths(Date.From(Date.StartOfMonth(DateTime.LocalNow())),-1)  
+and [Data_Recusa] < Date.AddMonths(Date.From(Date.StartOfMonth(DateTime.LocalNow())),0))
+
+# Adicionando coluna para filtrar 3 meses anteriores
+= Table.AddColumn(#"Tipo Alterado", "Filtro de 3 meses", each [Data_Recusa] >= Date.AddMonths(Date.From(Date.StartOfMonth(DateTime.LocalNow())),-3)  
+and [Data_Recusa] < Date.AddMonths(Date.From(Date.StartOfMonth(DateTime.LocalNow())),0))
+
+# Filtrar diretamente a coluna (filtro de data) - mês anterior
+= Table.SelectRows(#"Linhas Filtradas", each [Data de aprovação] >= Date.AddYears(Date.From(Date.StartOfMonth(DateTime.LocalNow())),-1) 
+and [Data de aprovação] < Date.AddYears(Date.From(Date.StartOfMonth(DateTime.LocalNow())),0))

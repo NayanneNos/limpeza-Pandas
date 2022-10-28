@@ -307,3 +307,5 @@ for f in lista_arquivos:
 
 documentos = dict(zip(limpo_arquivos, data_arquivos))
 
+# Abrir arquivo
+os.startfile('ENDEREÇO DE ARQUIVO')

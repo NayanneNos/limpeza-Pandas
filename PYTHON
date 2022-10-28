@@ -1,0 +1,64 @@
+# FECHAR EXECUTÁVEL
+os.system("TASKKILL /F /IM Nosso3.exe")
+
+# TABALHANDO COM TELAS WINDONS
+import pygetwindow as gw
+window = gw.getWindowsWithTitle('AR Nosso - Google Chrome')[0]
+window.minimize()
+window.maximize()
+
+# ABRIR CHOME PELO .PY E SELECIONAOD A PASTA QUE DESEJA SALVAR DOWNLOAD
+options = webdriver.ChromeOptions()
+preferences = {"download.default_directory": "PASTA", "safebrowsing.enabled": "false"}
+options.add_experimental_option("prefs", preferences)
+driver = webdriver.Chrome(executable_path=r'C:\chromedriver.exe', options=options)
+
+driver.get("URL")
+
+
+# Função para renomear arquivos mês anterior
+
+dia = date.today()
+# dia = sp_feriados.rollback(dia - pd.tseries.offsets.BusinessDay(n=1))
+
+primeiroDia = dia.replace(day=1)
+primeiroDia= primeiroDia.strftime("%d/%m/%Y")
+# primeiroDia= '01/08/2022'
+nxt_mnth = dia.replace(day=28) + datetime.timedelta(days=4)
+ultimoDia = nxt_mnth - datetime.timedelta(days=nxt_mnth.day)
+ultimoDia = ultimoDia.strftime("%d/%m/%Y")
+# ultimoDia= '31/08/2022'
+nome = dia.strftime("%m%Y")
+
+
+
+dataInicio = '//*[@id="dataini"]'
+dataFim = '//*[@id="datafim"]'
+
+driver.find_element_by_xpath(dataInicio).send_keys(Keys.CONTROL + 'a', Keys.BACKSPACE)
+driver.find_element_by_xpath(dataInicio).send_keys(primeiroDia)
+
+driver.find_element_by_xpath(dataFim).send_keys(Keys.CONTROL + 'a', Keys.BACKSPACE)
+driver.find_element_by_xpath(dataFim).send_keys(ultimoDia)
+
+driver.find_element_by_xpath(ok).click()
+
+
+# EXTRAINDO DADOS DE UMA PÁGINA
+dez = driver.find_element(By.XPATH, value = '//*[@id="row_10"]')
+onze = driver.find_element(By.XPATH, value = '//*[@id="row_11"]')
+doze = driver.find_element(By.XPATH, value = '//*[@id="row_12"]')
+treze = driver.find_element(By.XPATH, value = '//*[@id="row_13"]')
+quartoze = driver.find_element(By.XPATH, value = '//*[@id="row_14"]')
+quinze = driver.find_element(By.XPATH, value = '//*[@id="row_15"]')
+dezesseis = driver.find_element(By.XPATH, value = '//*[@id="row_16"]')
+dezessete = driver.find_element(By.XPATH, value = '//*[@id="row_17"]')
+dezoito = driver.find_element(By.XPATH, value = '//*[@id="row_18"]')
+
+# CLICAR EM BOTÃO QUANDO APARECER
+WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="popup-window-content-voximplant_statistic_detail_filter_search_container"]/div/div/div[1]/div[2]/div[3]/span[2]/span[1]'))) 
+
+
+
+
+
